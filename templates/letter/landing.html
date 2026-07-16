@@ -1,0 +1,287 @@
+{% extends "letter/_base.html" %}
+{% block title %}Letter From Your Future Self — Vedic AI{% endblock %}
+
+{% block content %}
+<!-- ── HERO ─────────────────────────────────────────────────────────── -->
+<header class="wrap" style="padding-top:96px;text-align:center">
+  <div class="eyebrow fade-up">A Letter Written By Who You Become</div>
+  <h1 class="fade-up d1" style="font-size:clamp(38px,6.4vw,68px);line-height:1.12;margin:22px 0 10px">
+    A Letter From Your <span class="gold-text">Future Self</span>
+  </h1>
+  <p class="fade-up d2" style="font-family:var(--font-head);font-size:clamp(18px,2.4vw,24px);color:var(--ink-dim)">
+    Grounded in your exact Vedic birth chart. Written as if you'd already lived it.
+  </p>
+  <p class="fade-up d2" style="max-width:600px;margin:18px auto 0;color:var(--ink-dim);line-height:1.8">
+    Not a horoscope. Not a prediction. A single, deeply personal letter — from the version
+    of you who has already moved through this exact chapter of your chart — written by AI,
+    grounded in real planetary positions, dasha timing, and classical Vedic texts.
+  </p>
+  <div class="fade-up d3" style="margin-top:36px">
+    <a href="#form" class="btn btn-gold" style="font-size:18px;padding:18px 46px">✦ Write My Letter</a>
+  </div>
+  <div class="fade-up d4" style="margin-top:18px">
+    <span class="chip gold">₹{{ price.current_price }} · One letter, yours forever</span>
+  </div>
+</header>
+
+<!-- ── WHAT IT IS ───────────────────────────────────────────────────── -->
+<section class="wrap" style="margin-top:84px;max-width:760px">
+  <div class="card fade-up" style="text-align:center">
+    <div class="eyebrow" style="margin-bottom:10px">How it's different</div>
+    <p style="color:var(--ink-dim);line-height:1.9;font-size:15.5px">
+      No astrology jargon. No "Saturn transits your 10th house." Just a warm, specific,
+      handwritten-feeling letter — as if a version of you who has already lived through
+      what your chart describes sat down and wrote to you about it. The chart provides
+      the truth underneath; the letter never mentions it by name.
+    </p>
+  </div>
+</section>
+
+<!-- ── BIRTH FORM ───────────────────────────────────────────────────── -->
+<section id="form" class="wrap" style="margin-top:70px;max-width:640px">
+  <div class="card fade-up">
+    <div class="eyebrow" style="margin-bottom:8px">Step 1 of 2</div>
+    <h2 style="font-size:30px;margin-bottom:6px">Your Birth Details</h2>
+    <p style="color:var(--ink-dim);font-size:14px;margin-bottom:26px">
+      Exact time and place ground the letter in your real chart.
+    </p>
+
+    <div class="field" style="margin-bottom:18px">
+      <label>Full Name (optional)</label>
+      <input id="f-name" type="text" placeholder="Your name" maxlength="100">
+    </div>
+
+    <div class="field" style="margin-bottom:18px">
+      <label>Email address *</label>
+      <input id="f-email" type="email" placeholder="you@example.com" maxlength="255" required>
+      <small style="color:var(--ink-dim)">We use this to send your receipt and secure letter link.</small>
+    </div>
+
+    <div class="field" style="margin-bottom:18px">
+      <label>Mobile number (optional)</label>
+      <input id="f-mobile" type="tel" placeholder="+91 98765 43210" maxlength="20">
+    </div>
+
+    <div class="grid-2" style="margin-bottom:18px">
+      <div class="field"><label>Date of Birth *</label><input id="f-date" type="date" required></div>
+      <div class="field"><label>Time of Birth *</label><input id="f-time" type="time" required></div>
+    </div>
+
+    <div class="field" style="margin-bottom:8px">
+      <label>Birth Place *</label>
+      <input id="f-city" type="text" list="city-datalist" autocomplete="off" placeholder="Start typing your city or town…">
+      <datalist id="city-datalist"></datalist>
+    </div>
+    <p style="font-size:12px;color:var(--ink-dim);margin:0 0 18px">
+      Can't find your town? <a href="#" id="toggle-custom" style="color:var(--gold)">Enter coordinates manually</a>
+    </p>
+
+    <div id="custom-coords" class="grid-2" style="display:none;margin-bottom:18px">
+      <div class="field"><label>Latitude</label><input id="f-lat" type="number" step="0.0001" placeholder="21.1458"></div>
+      <div class="field"><label>Longitude</label><input id="f-lon" type="number" step="0.0001" placeholder="79.0882"></div>
+    </div>
+
+    <div class="field" style="margin-bottom:18px">
+      <label>Letter Language</label>
+      <select id="f-language">
+        <option value="en">English</option>
+        <option value="hi">हिन्दी (Hindi)</option>
+        <option value="ta">தமிழ் (Tamil)</option>
+        <option value="te">తెలుగు (Telugu)</option>
+        <option value="bn">বাংলা (Bengali)</option>
+        <option value="mr">मराठी (Marathi)</option>
+        <option value="kn">ಕನ್ನಡ (Kannada)</option>
+        <option value="gu">ગુજરાતી (Gujarati)</option>
+        <option value="ml">മലയാളം (Malayalam)</option>
+        <option value="pa">ਪੰਜਾਬੀ (Punjabi)</option>
+      </select>
+    </div>
+
+    <div id="f-err" style="display:none;color:var(--red);font-size:14px;margin-bottom:16px"></div>
+
+    <button id="f-submit" class="btn btn-gold" style="width:100%;font-size:17px" onclick="submitBirth()">
+      ✦ Continue to Payment
+    </button>
+    <p style="text-align:center;color:var(--ink-dim);font-size:12px;margin-top:14px">
+      ₹{{ price.current_price }} · One letter · Yours forever
+    </p>
+  </div>
+</section>
+
+<!-- ── TESTIMONIALS ─────────────────────────────────────────────────── -->
+<section class="wrap" style="margin:100px auto">
+  <div class="eyebrow" style="text-align:center;margin-bottom:30px">What readers felt</div>
+  <div class="stats">
+    <div class="card lift"><p style="color:var(--ink-dim);line-height:1.8;font-size:14.5px">
+      "I didn't expect to cry reading something an AI wrote. It named exactly the pattern
+      I've been stuck in without ever saying a word about astrology."</p>
+      <div style="margin-top:14px;color:var(--gold)">— Priya S., Pune</div></div>
+    <div class="card lift"><p style="color:var(--ink-dim);line-height:1.8;font-size:14.5px">
+      "It felt like it actually knew me. Not generic at all — specific in a way that made
+      it obviously mine."</p>
+      <div style="margin-top:14px;color:var(--gold)">— Rohan M., Mumbai</div></div>
+    <div class="card lift"><p style="color:var(--ink-dim);line-height:1.8;font-size:14.5px">
+      "Read it three times the first night. Printed it and keep it in my desk drawer."</p>
+      <div style="margin-top:14px;color:var(--gold)">— Ananya K., Bengaluru</div></div>
+  </div>
+</section>
+
+<footer style="text-align:center;padding:40px 0 60px;color:var(--ink-dim);font-size:12px">
+  ✦ Letter From Your Future Self · Swiss Ephemeris · Lahiri Ayanamsha · Whole Sign Houses
+</footer>
+{% endblock %}
+
+{% block scripts %}
+<script>
+// Major Indian cities & towns, covering every state/UT. All at IST (UTC+5.5).
+const CITY_COORDS = {
+  "Mumbai, Maharashtra": [19.0760, 72.8777], "Pune, Maharashtra": [18.5204, 73.8567],
+  "Nagpur, Maharashtra": [21.1458, 79.0882], "Nashik, Maharashtra": [19.9975, 73.7898],
+  "Aurangabad, Maharashtra": [19.8762, 75.3433], "Solapur, Maharashtra": [17.6599, 75.9064],
+  "Kolhapur, Maharashtra": [16.7050, 74.2433], "Amravati, Maharashtra": [20.9374, 77.7796],
+  "Thane, Maharashtra": [19.2183, 72.9781], "Navi Mumbai, Maharashtra": [19.0330, 73.0297],
+  "Delhi, Delhi": [28.6139, 77.2090], "New Delhi, Delhi": [28.6139, 77.2090],
+  "Chennai, Tamil Nadu": [13.0827, 80.2707], "Coimbatore, Tamil Nadu": [11.0168, 76.9558],
+  "Madurai, Tamil Nadu": [9.9252, 78.1198], "Tiruchirappalli, Tamil Nadu": [10.7905, 78.7047],
+  "Salem, Tamil Nadu": [11.6643, 78.1460], "Tirunelveli, Tamil Nadu": [8.7139, 77.7567],
+  "Vellore, Tamil Nadu": [12.9165, 79.1325], "Erode, Tamil Nadu": [11.3410, 77.7172],
+  "Kolkata, West Bengal": [22.5726, 88.3639], "Howrah, West Bengal": [22.5958, 88.2636],
+  "Durgapur, West Bengal": [23.5204, 87.3119], "Asansol, West Bengal": [23.6739, 86.9524],
+  "Siliguri, West Bengal": [26.7271, 88.3953],
+  "Bengaluru, Karnataka": [12.9716, 77.5946], "Mysuru, Karnataka": [12.2958, 76.6394],
+  "Hubballi, Karnataka": [15.3647, 75.1240], "Mangaluru, Karnataka": [12.9141, 74.8560],
+  "Belagavi, Karnataka": [15.8497, 74.4977], "Davanagere, Karnataka": [14.4644, 75.9218],
+  "Ballari, Karnataka": [15.1394, 76.9214],
+  "Hyderabad, Telangana": [17.3850, 78.4867], "Warangal, Telangana": [17.9689, 79.5941],
+  "Nizamabad, Telangana": [18.6725, 78.0941], "Karimnagar, Telangana": [18.4386, 79.1288],
+  "Ahmedabad, Gujarat": [23.0225, 72.5714], "Surat, Gujarat": [21.1702, 72.8311],
+  "Vadodara, Gujarat": [22.3072, 73.1812], "Rajkot, Gujarat": [22.3039, 70.8022],
+  "Bhavnagar, Gujarat": [21.7645, 72.1519], "Jamnagar, Gujarat": [22.4707, 70.0577],
+  "Gandhinagar, Gujarat": [23.2156, 72.6369], "Junagadh, Gujarat": [21.5222, 70.4579],
+  "Jaipur, Rajasthan": [26.9124, 75.7873], "Jodhpur, Rajasthan": [26.2389, 73.0243],
+  "Udaipur, Rajasthan": [24.5854, 73.7125], "Kota, Rajasthan": [25.2138, 75.8648],
+  "Bikaner, Rajasthan": [28.0229, 73.3119], "Ajmer, Rajasthan": [26.4499, 74.6399],
+  "Alwar, Rajasthan": [27.5530, 76.6346],
+  "Lucknow, Uttar Pradesh": [26.8467, 80.9462], "Kanpur, Uttar Pradesh": [26.4499, 80.3319],
+  "Varanasi, Uttar Pradesh": [25.3176, 82.9739], "Agra, Uttar Pradesh": [27.1767, 78.0081],
+  "Prayagraj, Uttar Pradesh": [25.4358, 81.8463], "Meerut, Uttar Pradesh": [28.9845, 77.7064],
+  "Ghaziabad, Uttar Pradesh": [28.6692, 77.4538], "Noida, Uttar Pradesh": [28.5355, 77.3910],
+  "Bareilly, Uttar Pradesh": [28.3670, 79.4304], "Aligarh, Uttar Pradesh": [27.8974, 78.0880],
+  "Moradabad, Uttar Pradesh": [28.8386, 78.7733], "Saharanpur, Uttar Pradesh": [29.9680, 77.5460],
+  "Gorakhpur, Uttar Pradesh": [26.7606, 83.3732], "Jhansi, Uttar Pradesh": [25.4484, 78.5685],
+  "Bhopal, Madhya Pradesh": [23.2599, 77.4126], "Indore, Madhya Pradesh": [22.7196, 75.8577],
+  "Jabalpur, Madhya Pradesh": [23.1815, 79.9864], "Gwalior, Madhya Pradesh": [26.2183, 78.1828],
+  "Ujjain, Madhya Pradesh": [23.1765, 75.7885], "Sagar, Madhya Pradesh": [23.8388, 78.7378],
+  "Satna, Madhya Pradesh": [24.5854, 80.8322],
+  "Patna, Bihar": [25.5941, 85.1376], "Gaya, Bihar": [24.7955, 84.9994],
+  "Bhagalpur, Bihar": [25.2445, 86.9718], "Muzaffarpur, Bihar": [26.1225, 85.3906],
+  "Darbhanga, Bihar": [26.1542, 85.8918],
+  "Raipur, Chhattisgarh": [21.2514, 81.6296], "Bhilai, Chhattisgarh": [21.2094, 81.4285],
+  "Bilaspur, Chhattisgarh": [22.0797, 82.1391], "Durg, Chhattisgarh": [21.1904, 81.2849],
+  "Bhubaneswar, Odisha": [20.2961, 85.8245], "Cuttack, Odisha": [20.4625, 85.8828],
+  "Rourkela, Odisha": [22.2604, 84.8536], "Puri, Odisha": [19.8135, 85.8312],
+  "Sambalpur, Odisha": [21.4669, 83.9756],
+  "Chandigarh, Chandigarh": [30.7333, 76.7794],
+  "Ludhiana, Punjab": [30.9010, 75.8573], "Amritsar, Punjab": [31.6340, 74.8723],
+  "Jalandhar, Punjab": [31.3260, 75.5762], "Patiala, Punjab": [30.3398, 76.3869],
+  "Bathinda, Punjab": [30.2110, 74.9455],
+  "Faridabad, Haryana": [28.4089, 77.3178], "Gurugram, Haryana": [28.4595, 77.0266],
+  "Panipat, Haryana": [29.3909, 76.9635], "Ambala, Haryana": [30.3782, 76.7767],
+  "Karnal, Haryana": [29.6857, 76.9905], "Hisar, Haryana": [29.1492, 75.7217],
+  "Rohtak, Haryana": [28.8955, 76.6066],
+  "Shimla, Himachal Pradesh": [31.1048, 77.1734], "Manali, Himachal Pradesh": [32.2432, 77.1892],
+  "Dharamshala, Himachal Pradesh": [32.2190, 76.3234],
+  "Dehradun, Uttarakhand": [30.3165, 78.0322], "Haridwar, Uttarakhand": [29.9457, 78.1642],
+  "Nainital, Uttarakhand": [29.3803, 79.4636], "Rishikesh, Uttarakhand": [30.0869, 78.2676],
+  "Ranchi, Jharkhand": [23.3441, 85.3096], "Jamshedpur, Jharkhand": [22.8046, 86.2029],
+  "Dhanbad, Jharkhand": [23.7957, 86.4304], "Bokaro, Jharkhand": [23.6693, 86.1511],
+  "Thiruvananthapuram, Kerala": [8.5241, 76.9366], "Kochi, Kerala": [9.9312, 76.2673],
+  "Kozhikode, Kerala": [11.2588, 75.7804], "Thrissur, Kerala": [10.5276, 76.2144],
+  "Kollam, Kerala": [8.8932, 76.6141], "Kannur, Kerala": [11.8745, 75.3704],
+  "Kottayam, Kerala": [9.5916, 76.5222], "Alappuzha, Kerala": [9.4981, 76.3388],
+  "Palakkad, Kerala": [10.7867, 76.6548],
+  "Visakhapatnam, Andhra Pradesh": [17.6868, 83.2185], "Vijayawada, Andhra Pradesh": [16.5062, 80.6480],
+  "Guntur, Andhra Pradesh": [16.3067, 80.4365], "Tirupati, Andhra Pradesh": [13.6288, 79.4192],
+  "Nellore, Andhra Pradesh": [14.4426, 79.9865], "Kurnool, Andhra Pradesh": [15.8281, 78.0373],
+  "Rajahmundry, Andhra Pradesh": [17.0005, 81.8040], "Kadapa, Andhra Pradesh": [14.4673, 78.8242],
+  "Guwahati, Assam": [26.1445, 91.7362], "Silchar, Assam": [24.8333, 92.7789],
+  "Dibrugarh, Assam": [27.4728, 94.9120], "Jorhat, Assam": [26.7509, 94.2037],
+  "Panaji, Goa": [15.4909, 73.8278], "Margao, Goa": [15.2832, 73.9862],
+  "Srinagar, Jammu and Kashmir": [34.0837, 74.7973], "Jammu, Jammu and Kashmir": [32.7266, 74.8570],
+  "Leh, Ladakh": [34.1526, 77.5771],
+  "Puducherry, Puducherry": [11.9416, 79.8083], "Port Blair, Andaman and Nicobar Islands": [11.6234, 92.7265],
+  "Agartala, Tripura": [23.8315, 91.2868], "Imphal, Manipur": [24.8170, 93.9368],
+  "Shillong, Meghalaya": [25.5788, 91.8933], "Aizawl, Mizoram": [23.7271, 92.7176],
+  "Kohima, Nagaland": [25.6751, 94.1086], "Dimapur, Nagaland": [25.9091, 93.7266],
+  "Gangtok, Sikkim": [27.3389, 88.6065], "Itanagar, Arunachal Pradesh": [27.0844, 93.6053],
+};
+
+(function populateCityList() {
+  const dl = document.getElementById('city-datalist');
+  Object.keys(CITY_COORDS).sort().forEach(name => {
+    const opt = document.createElement('option');
+    opt.value = name;
+    dl.appendChild(opt);
+  });
+})();
+
+document.getElementById('toggle-custom').addEventListener('click', function (e) {
+  e.preventDefault();
+  const box = document.getElementById('custom-coords');
+  box.style.display = box.style.display === 'grid' ? 'none' : 'grid';
+});
+
+async function submitBirth() {
+  const err = document.getElementById('f-err');
+  err.style.display = 'none';
+
+  const d = document.getElementById('f-date').value;
+  const t = document.getElementById('f-time').value;
+  const email = document.getElementById('f-email').value.trim();
+  if (!d || !t) { err.textContent = 'Date and time of birth are required.'; err.style.display = 'block'; return; }
+  if (!email) { err.textContent = 'Your email address is required to deliver your letter.'; err.style.display = 'block'; return; }
+
+  let lat, lon, tz = 5.5, place;
+  const cityInput = document.getElementById('f-city').value.trim();
+  const customVisible = document.getElementById('custom-coords').style.display === 'grid';
+  if (customVisible) {
+    lat = parseFloat(document.getElementById('f-lat').value);
+    lon = parseFloat(document.getElementById('f-lon').value);
+    place = cityInput || 'Custom coordinates';
+    if (isNaN(lat) || isNaN(lon)) { err.textContent = 'Enter valid coordinates.'; err.style.display = 'block'; return; }
+  } else if (CITY_COORDS[cityInput]) {
+    [lat, lon] = CITY_COORDS[cityInput];
+    place = cityInput;
+  } else {
+    err.textContent = 'Pick your city from the list, or use "Enter coordinates manually" below the field.';
+    err.style.display = 'block';
+    return;
+  }
+
+  const [year, month, day] = d.split('-').map(Number);
+  const [hour, minute] = t.split(':').map(Number);
+
+  const btn = document.getElementById('f-submit');
+  btn.disabled = true; btn.textContent = 'Casting your chart…';
+
+  try {
+    const r = await fetch('/letter/api/preview', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        name: document.getElementById('f-name').value,
+        email,
+        mobile: document.getElementById('f-mobile').value,
+        language: document.getElementById('f-language').value,
+        year, month, day, hour, minute, lat, lon, timezone: tz, birth_place: place
+      })
+    });
+    const data = await r.json();
+    if (!r.ok) throw new Error(data.error || 'Server error');
+    window.location.href = data.checkout_url;
+  } catch (e) {
+    err.textContent = e.message; err.style.display = 'block';
+    btn.disabled = false; btn.textContent = '✦ Continue to Payment';
+  }
+}
+</script>
+{% endblock %}

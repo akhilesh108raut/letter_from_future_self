@@ -1,0 +1,122 @@
+{% extends "letter/_base.html" %}
+{% block title %}Unlock Your Letter{% endblock %}
+
+{% block content %}
+<div class="wrap" style="max-width:640px;padding-top:64px;padding-bottom:80px">
+
+  <div style="text-align:center;margin-bottom:40px" class="fade-up">
+    <div class="eyebrow">Step 2 of 2</div>
+    <h1 style="font-size:clamp(28px,4.6vw,40px);margin-top:14px">
+      {{ order.name or "Your" }}{{ "’s" if order.name else "" }} Letter Is Ready to Be Written
+    </h1>
+    <p style="color:var(--ink-dim);margin-top:8px;font-size:14px">
+      Born {{ "%02d"|format(order.day) }}-{{ "%02d"|format(order.month) }}-{{ order.year }}
+      at {{ "%02d"|format(order.hour) }}:{{ "%02d"|format(order.minute) }}
+      {% if order.birth_place %} · {{ order.birth_place }}{% endif %}
+    </p>
+  </div>
+
+  <div class="locked-section card fade-up d1" style="padding:0">
+    <div class="locked-blur" style="padding:28px">
+      <div style="margin-bottom:22px">
+        <h3 style="font-size:19px;margin-bottom:8px">Dear friend,</h3>
+        <div class="skeleton" style="width:92%;height:13px;margin-bottom:7px"></div>
+        <div class="skeleton" style="width:84%;height:13px;margin-bottom:7px"></div>
+        <div class="skeleton" style="width:88%;height:13px;margin-bottom:7px"></div>
+        <div class="skeleton" style="width:64%;height:13px;margin-bottom:22px"></div>
+        <div class="skeleton" style="width:80%;height:13px;margin-bottom:7px"></div>
+        <div class="skeleton" style="width:70%;height:13px"></div>
+      </div>
+    </div>
+    <div class="lock-overlay">
+      <div class="lock-icon">✦</div>
+      <h2 style="font-size:26px">Unlock Your Letter</h2>
+      <p style="color:var(--ink-dim);max-width:420px;font-size:14px;padding:0 18px">
+        A single, personal letter written as your own future self — grounded in your
+        exact chart, no jargon, yours to keep forever.
+      </p>
+      <button id="pay-btn" class="btn btn-gold" style="font-size:18px;padding:18px 44px" onclick="startPayment()">
+        Pay ₹{{ price.current_price }} — Unlock Now
+      </button>
+      {% if dev_mode %}
+      <div class="chip" style="border-color:var(--red);color:var(--red)">DEV MODE — payment simulated locally</div>
+      {% endif %}
+    </div>
+  </div>
+
+  <div id="pay-err" style="display:none;color:var(--red);text-align:center;margin-top:16px"></div>
+
+  <div class="no-print" style="text-align:center;margin-top:26px">
+    <a href="/letter/" class="btn btn-ghost" style="font-size:13px;padding:10px 22px">← Edit birth details</a>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+{% if not dev_mode %}<script src="https://checkout.razorpay.com/v1/checkout.js"></script>{% endif %}
+<script>
+const ORDER_UUID = {{ order.uuid|tojson }};
+const DEV_MODE = {{ 'true' if dev_mode else 'false' }};
+
+function fail(msg) {
+  const e = document.getElementById('pay-err');
+  e.textContent = msg; e.style.display = 'block';
+  document.getElementById('pay-btn').disabled = false;
+}
+
+async function startPayment() {
+  const btn = document.getElementById('pay-btn');
+  btn.disabled = true;
+  document.getElementById('pay-err').style.display = 'none';
+
+  let order;
+  try {
+    const r = await fetch('/letter/api/create-order', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ order_uuid: ORDER_UUID })
+    });
+    order = await r.json();
+    if (!r.ok) throw new Error(order.error || 'Could not start payment');
+  } catch (e) { return fail(e.message); }
+
+  if (order.already_paid) { window.location.href = order.report_url; return; }
+
+  if (order.dev_mode) {
+    try {
+      const r = await fetch('/letter/api/dev-pay', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ order_uuid: ORDER_UUID })
+      });
+      const d = await r.json();
+      if (!r.ok) throw new Error(d.error || 'Simulation failed');
+      window.location.href = d.report_url;
+    } catch (e) { fail(e.message); }
+    return;
+  }
+
+  const rzp = new Razorpay({
+    key: order.key_id,
+    amount: order.amount,
+    currency: 'INR',
+    name: 'Letter From Your Future Self',
+    description: 'Vedic AI Letter',
+    order_id: order.order_id,
+    theme: { color: '#d9b25b' },
+    modal: { ondismiss: () => { window.location.href = '/letter/cancel'; } },
+    handler: async function (resp) {
+      try {
+        const r = await fetch('/letter/api/verify', {
+          method: 'POST', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(resp)
+        });
+        const d = await r.json();
+        if (!r.ok) throw new Error(d.error || 'Verification failed');
+        // Payment is instant now — generation happens on the letter page itself.
+        window.location.href = d.report_url;
+      } catch (e) { fail(e.message); }
+    }
+  });
+  rzp.open();
+}
+</script>
+{% endblock %}

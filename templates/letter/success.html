@@ -1,0 +1,11 @@
+{% extends "letter/_base.html" %}
+{% block title %}Payment Complete{% endblock %}
+
+{% block content %}
+<div class="wrap" style="max-width:520px;padding-top:120px;text-align:center">
+  <div style="font-size:44px" class="fade-up">✦</div>
+  <h1 class="fade-up d1" style="font-size:32px;margin:18px 0 10px">Your letter is unlocked</h1>
+  <p class="fade-up d2" style="color:var(--ink-dim);margin-bottom:30px">Payment already confirmed.</p>
+  <a class="fade-up d3 btn btn-gold" href="/letter/read/{{ letter_uuid }}" style="font-size:16px">Read My Letter</a>
+</div>
+{% endblock %}
