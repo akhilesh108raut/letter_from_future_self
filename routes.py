@@ -169,8 +169,8 @@ def api_preview():
         tz = float(data.get("timezone", 5.5))
     except (KeyError, TypeError, ValueError):
         return jsonify(error="Invalid birth details."), 400
-    if not (-90 <= lat <= 90 and -180 <= lon <= 180 and 1 <= month <= 12):
-        return jsonify(error="Invalid coordinates or date."), 400
+    if not (-90 <= lat <= 90 and -180 <= lon <= 180 and 1 <= month <= 12 and -12 <= tz <= 14):
+        return jsonify(error="Invalid coordinates, timezone, or date."), 400
 
     from engine.chart import build_chart
     from rag.rule_engine import query_rules
