@@ -44,8 +44,9 @@ class Order(db.Model):
     language    = db.Column(db.String(8), default="en")
 
     # Money — price is locked server-side at order creation time
-    price_paid  = db.Column(db.Integer, nullable=True)   # INR, whole rupees
+    price_paid  = db.Column(db.Float, nullable=True)      # in `currency`'s major unit
     currency    = db.Column(db.String(8), default="INR")
+    share_count = db.Column(db.Integer, default=0, nullable=False)
     status      = db.Column(db.String(24), default="created",
                             index=True)  # created | paid | failed
 

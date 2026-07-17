@@ -46,6 +46,31 @@
 
   <div id="pay-err" style="display:none;color:var(--red);text-align:center;margin-top:16px"></div>
 
+  <!-- ── SHARE TO UNLOCK FREE ─────────────────────────────────────── -->
+  <div class="card fade-up d2" style="margin-top:22px;text-align:center">
+    <div class="eyebrow" style="margin-bottom:8px">Or Get It Free</div>
+    <h3 style="font-size:20px;margin-bottom:6px">Share {{ price.share_target }} Times, Unlock For Free</h3>
+    <p style="color:var(--ink-dim);font-size:13.5px;margin-bottom:18px;max-width:420px;margin-left:auto;margin-right:auto">
+      Share this page with friends on WhatsApp or Instagram. After {{ price.share_target }} shares,
+      your letter unlocks — no payment needed.
+    </p>
+    <div class="progress-track" style="max-width:320px;margin:0 auto 10px">
+      <div id="share-bar" class="progress-fill" style="width:0%"></div>
+    </div>
+    <p id="share-count-label" style="color:var(--ink-dim);font-size:12.5px;margin-bottom:18px">0 / {{ price.share_target }} shares</p>
+    <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-bottom:14px">
+      <button class="btn btn-ghost" style="font-size:14px;padding:12px 22px" onclick="shareVia('whatsapp')">
+        📱 Share on WhatsApp
+      </button>
+      <button class="btn btn-ghost" style="font-size:14px;padding:12px 22px" onclick="shareVia('instagram')">
+        📷 Share on Instagram
+      </button>
+    </div>
+    <button id="claim-free-btn" class="btn btn-gold" style="font-size:15px;padding:12px 28px;display:none" onclick="claimFree()">
+      ✦ Unlock My Letter — Free
+    </button>
+  </div>
+
   <div class="no-print" style="text-align:center;margin-top:26px">
     <a href="/letter/" class="btn btn-ghost" style="font-size:13px;padding:10px 22px">← Edit birth details</a>
   </div>
@@ -57,6 +82,57 @@
 <script>
 const ORDER_UUID = {{ order.uuid|tojson }};
 const DEV_MODE = {{ 'true' if dev_mode else 'false' }};
+const SHARE_TARGET = {{ price.share_target }};
+const SHARE_URL = window.location.href;
+const SHARE_TEXT = "I just got a letter from my future self, written from my real birth chart. You can get yours here:";
+
+updateShareUI({{ order.share_count }});
+
+function updateShareUI(count) {
+  const pct = Math.min(100, Math.round((count / SHARE_TARGET) * 100));
+  document.getElementById('share-bar').style.width = pct + '%';
+  document.getElementById('share-count-label').textContent = `${Math.min(count, SHARE_TARGET)} / ${SHARE_TARGET} shares`;
+  if (count >= SHARE_TARGET) {
+    document.getElementById('claim-free-btn').style.display = 'inline-flex';
+  }
+}
+
+async function registerShare() {
+  try {
+    const r = await fetch(`/letter/api/order/${ORDER_UUID}/share`, { method: 'POST' });
+    const d = await r.json();
+    if (r.ok) updateShareUI(d.share_count);
+  } catch (e) { /* non-fatal — sharing still opened even if this fails */ }
+}
+
+function shareVia(platform) {
+  const text = encodeURIComponent(SHARE_TEXT + ' ' + SHARE_URL);
+  if (platform === 'whatsapp') {
+    window.open(`https://wa.me/?text=${text}`, '_blank');
+  } else if (platform === 'instagram') {
+    // Instagram has no web share-intent URL, so copy the message and send
+    // the user to Instagram directly — same pattern most sites use.
+    navigator.clipboard.writeText(SHARE_TEXT + ' ' + SHARE_URL).catch(() => {});
+    window.open('https://www.instagram.com/', '_blank');
+  }
+  registerShare();
+}
+
+async function claimFree() {
+  const btn = document.getElementById('claim-free-btn');
+  btn.disabled = true; btn.textContent = 'Unlocking…';
+  try {
+    const r = await fetch(`/letter/api/order/${ORDER_UUID}/claim-free`, {
+      method: 'POST', headers: { 'Content-Type': 'application/json' }
+    });
+    const d = await r.json();
+    if (!r.ok) throw new Error(d.error || 'Could not unlock yet');
+    window.location.href = d.report_url;
+  } catch (e) {
+    fail(e.message);
+    btn.disabled = false; btn.textContent = '✦ Unlock My Letter — Free';
+  }
+}
 
 function fail(msg) {
   const e = document.getElementById('pay-err');
@@ -97,7 +173,7 @@ async function startPayment() {
   const rzp = new Razorpay({
     key: order.key_id,
     amount: order.amount,
-    currency: 'INR',
+    currency: order.currency,
     name: 'Letter From Your Future Self',
     description: 'Vedic AI Letter',
     order_id: order.order_id,

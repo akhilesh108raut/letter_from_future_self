@@ -205,6 +205,55 @@ def api_preview():
     return jsonify(checkout_url=f"/letter/checkout/{order.uuid}")
 
 
+@letter_bp.route("/api/order/<order_uuid>/share", methods=["POST"])
+def api_register_share(order_uuid):
+    """Honor-system share tracking: the client calls this once per share-button
+    click (WhatsApp/Instagram). No platform gives a way to verify a share
+    actually happened without an app-review'd API integration, so this is
+    intentionally gameable via devtools — same tradeoff every "share to
+    unlock" growth mechanic makes. Once share_count reaches SHARE_TARGET,
+    the order can be claimed free via /api/claim-free instead of paying."""
+    if _rate_limited(f"share:{request.remote_addr}", limit=30):
+        return jsonify(error="Too many requests."), 429
+
+    order = Order.query.filter_by(uuid=order_uuid).first()
+    if not order:
+        return jsonify(error="Order not found."), 404
+    if order.status == "paid":
+        return jsonify(share_count=order.share_count, target=get_price_info()["share_target"],
+                       unlocked=True)
+
+    target = get_price_info()["share_target"]
+    if order.share_count < target:
+        order.share_count += 1
+        db.session.commit()
+    return jsonify(share_count=order.share_count, target=target,
+                   unlocked=order.share_count >= target)
+
+
+@letter_bp.route("/api/order/<order_uuid>/claim-free", methods=["POST"])
+def api_claim_free(order_uuid):
+    """Unlock a letter for free once the share target has been reached."""
+    if _rate_limited(f"claimfree:{request.remote_addr}", limit=10):
+        return jsonify(error="Too many requests."), 429
+
+    order = Order.query.filter_by(uuid=order_uuid).first()
+    if not order:
+        return jsonify(error="Order not found."), 404
+    if order.status == "paid":
+        return jsonify(success=True, report_url=f"/letter/read/{order.letter.uuid}")
+
+    target = get_price_info()["share_target"]
+    if order.share_count < target:
+        return jsonify(error=f"Share {target - order.share_count} more time(s) to unlock "
+                             f"for free."), 400
+
+    order.price_paid = 0
+    order.currency = get_price_info()["currency"]
+    url = _mark_paid(order, "free_via_share", f"share_count={order.share_count}")
+    return jsonify(success=True, report_url=url)
+
+
 @letter_bp.route("/api/create-order", methods=["POST"])
 def api_create_order():
     """Lock the server-side price and create a Razorpay order."""
@@ -219,16 +268,18 @@ def api_create_order():
         return jsonify(success=True, already_paid=True,
                        report_url=f"/letter/read/{order.letter.uuid}")
 
-    price = get_price_info()["current_price"]
+    info = get_price_info()
+    price, currency = info["current_price"], info["currency"]
     order.price_paid = price
+    order.currency = currency
     db.session.commit()
 
     if _dev_mode():
-        return jsonify(order_id=f"dev_order_{order.uuid}", amount=price * 100,
-                       key_id="", dev_mode=True)
+        return jsonify(order_id=f"dev_order_{order.uuid}", amount=round(price * 100),
+                       currency=currency, key_id="", dev_mode=True)
 
     try:
-        rp_order = payments.create_order(price, receipt=order.uuid)
+        rp_order = payments.create_order(price, receipt=order.uuid, currency=currency)
     except RuntimeError as e:
         log.exception("Razorpay order creation failed")
         return jsonify(error=str(e)), 502

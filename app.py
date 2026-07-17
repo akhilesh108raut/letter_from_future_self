@@ -42,7 +42,24 @@ def create_app():
 
     with app.app_context():
         db.create_all()
+        _run_light_migrations()
     return app
+
+
+def _run_light_migrations():
+    """create_all() only adds missing TABLES, never new COLUMNS on tables
+    that already exist — so any column added after the first deploy needs
+    a guard here, or every request against a live/persistent DB breaks."""
+    from sqlalchemy import inspect, text
+    inspector = inspect(db.engine)
+    if "lfs_orders" not in inspector.get_table_names():
+        return
+    existing = {c["name"] for c in inspector.get_columns("lfs_orders")}
+    with db.engine.begin() as conn:
+        if "share_count" not in existing:
+            conn.execute(text(
+                "ALTER TABLE lfs_orders ADD COLUMN share_count INTEGER DEFAULT 0"
+            ))
 
 
 app = create_app()

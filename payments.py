@@ -25,9 +25,11 @@ def razorpay_configured() -> bool:
     return bool(key_id and key_secret)
 
 
-def create_order(amount_inr: int, receipt: str) -> dict:
+def create_order(amount_major_units, receipt: str, currency: str = "INR") -> dict:
     """
-    Create a Razorpay order. Amount is in whole rupees; Razorpay wants paise.
+    Create a Razorpay order. `amount_major_units` is in the currency's main
+    unit (e.g. rupees) — Razorpay wants the smallest unit (paise), which for
+    every currency Razorpay supports is `amount * 100`.
     Raises RuntimeError with a readable message on failure.
     """
     key_id, key_secret = get_keys()
@@ -38,8 +40,8 @@ def create_order(amount_inr: int, receipt: str) -> dict:
     resp = requests.post(
         f"{RAZORPAY_API}/orders",
         json={
-            "amount": int(amount_inr) * 100,   # paise
-            "currency": "INR",
+            "amount": round(float(amount_major_units) * 100),
+            "currency": currency,
             "receipt": receipt,
             "payment_capture": 1,
         },
