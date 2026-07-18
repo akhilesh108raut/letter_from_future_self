@@ -146,7 +146,37 @@ def view_letter(letter_uuid):
     if ai.get("letter") and order.name:
         first = order.name.strip().split()[0]
         ai = {**ai, "letter": ai["letter"].replace("Dear friend,", f"Dear {first},")}
-    return render_template("letter/read.html", ai=ai, order=order, letter=letter)
+
+    # Split the salutation ("Dear X,") from the body so the reading page can
+    # render it as a luxury letter header (DEAR / Name) instead of a plain line.
+    paras = [p.strip() for p in (ai.get("letter") or "").split("\n\n") if p.strip()]
+    greeting_name, body_paras = None, paras
+    if paras and paras[0].lower().startswith("dear "):
+        greeting_name = paras[0][5:].strip().rstrip(",").strip()
+        body_paras = paras[1:]
+
+    # The letter's sigil = the reader's own dominant planet glyph (real chart
+    # data), not a hardcoded symbol. Falls back to a neutral star.
+    sigil = _letter_sigil(letter.chart())
+
+    return render_template("letter/read.html", ai=ai, order=order, letter=letter,
+                           greeting_name=greeting_name, body_paras=body_paras, sigil=sigil)
+
+
+_PLANET_GLYPH = {
+    "Sun": "☉", "Moon": "☾", "Mars": "♂", "Mercury": "☿", "Jupiter": "♃",
+    "Venus": "♀", "Saturn": "♄", "Rahu": "☊", "Ketu": "☋",
+}
+
+
+def _letter_sigil(chart: dict) -> str:
+    """The dominant planet's astrological glyph for this specific chart."""
+    dna = chart.get("chart_dna") or {}
+    dom = dna.get("dominant_planet")
+    if not dom:
+        themes = (chart.get("analysis") or {}).get("interpretation_themes") or {}
+        dom = themes.get("dominant_planet")
+    return _PLANET_GLYPH.get(dom, "✦")
 
 
 @letter_bp.route("/cancel")

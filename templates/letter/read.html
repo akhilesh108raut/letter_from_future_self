@@ -1,26 +1,94 @@
 {% extends "letter/_base.html" %}
 {% block title %}Your Letter From Your Future Self{% endblock %}
 
+{% block head %}
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500;1,600&family=Spectral:ital,wght@0,300;0,400;0,500;1,400&display=swap" rel="stylesheet">
+{% endblock %}
+
 {% block content %}
-<div class="scroll-stage">
-  <div class="wrap" style="max-width:820px">
+<div class="scroll-stage letter-luxe">
 
-    <div style="text-align:center" class="fade-up">
-      <div class="letter-chapter">{{ ai.life_chapter or "A Letter From Your Future Self" }}</div>
+  <!-- Atmosphere layers (all behind the reading column, none distracting) -->
+  <div class="atmos" aria-hidden="true">
+    <div class="atmos-nebula"></div>
+    <svg class="atmos-zodiac" viewBox="0 0 400 400" preserveAspectRatio="xMidYMid meet">
+      <circle cx="200" cy="200" r="196" fill="none" stroke="currentColor" stroke-width="0.5"/>
+      <circle cx="200" cy="200" r="150" fill="none" stroke="currentColor" stroke-width="0.5"/>
+      {% for i in range(12) %}
+      <line x1="200" y1="4" x2="200" y2="50" stroke="currentColor" stroke-width="0.5"
+            transform="rotate({{ i * 30 }} 200 200)"/>
+      {% endfor %}
+      {% for g in ["♈","♉","♊","♋","♌","♍","♎","♏","♐","♑","♒","♓"] %}
+      <text x="200" y="28" text-anchor="middle" font-size="13" fill="currentColor"
+            transform="rotate({{ loop.index0 * 30 }} 200 200)">{{ g }}</text>
+      {% endfor %}
+    </svg>
+    <div class="atmos-dust"></div>
+    <span class="particle" style="--px:12%;--d:0s"></span>
+    <span class="particle" style="--px:34%;--d:6s"></span>
+    <span class="particle" style="--px:61%;--d:3s"></span>
+    <span class="particle" style="--px:82%;--d:9s"></span>
+    <span class="particle" style="--px:47%;--d:12s"></span>
+  </div>
+
+  <div class="wrap" style="max-width:900px;position:relative;z-index:2">
+
+    <!-- ── QUOTE HERO ─────────────────────────────────────────────── -->
+    <div class="quote-hero fade-up">
+      <div class="quote-label">
+        <span class="qrule"></span>
+        <span>{{ ai.life_chapter or "A Letter From Your Future Self" }}</span>
+        <span class="qrule"></span>
+      </div>
       {% if ai.core_truth %}
-      <p class="letter-pullquote">“{{ ai.core_truth }}”</p>
+      <blockquote class="quote-mark">{{ ai.core_truth }}</blockquote>
       {% endif %}
+      <div class="quote-sigil">
+        <span class="qs-star">✦</span>
+        <span class="qs-glyph">{{ sigil }}</span>
+        <span class="qs-star">✦</span>
+      </div>
     </div>
 
-    <div class="scroll-ornament">✦ ❦ ✦</div>
+    <!-- ── THE LETTER (heirloom document) ─────────────────────────── -->
+    <article class="letter-paper fade-up d1" id="paper">
+      <span class="corner tl"></span><span class="corner tr"></span>
+      <span class="corner bl"></span><span class="corner br"></span>
 
-    <div class="letter-paper fade-up d1">
-      <div class="letter-body">{% for para in (ai.letter or "").split('\n\n') %}{% if para.strip() %}<p>{{ para.strip() }}</p>{% endif %}{% endfor %}</div>
-    </div>
+      <!-- Illuminated-manuscript rail -->
+      <div class="manuscript-rail" aria-hidden="true">
+        <span class="rail-star">✦</span>
+        <span class="rail-glyph">☾</span>
+        <span class="rail-line"></span>
+        <span class="rail-glyph">{{ sigil }}</span>
+        <span class="rail-line"></span>
+        <span class="rail-glyph">☉</span>
+        <span class="rail-star">✦</span>
+      </div>
+
+      {% if greeting_name %}
+      <header class="letter-head">
+        <div class="lh-dear">Dear</div>
+        <div class="lh-name">{{ greeting_name }}</div>
+        <div class="lh-divider"><span></span><b>{{ sigil }}</b><span></span></div>
+      </header>
+      {% endif %}
+
+      <div class="letter-body">
+        {% for para in body_paras %}<p>{{ para }}</p>{% endfor %}
+      </div>
+
+      <!-- ── Signature area ── -->
+      <footer class="letter-sign">
+        <span class="sign-rule"></span>
+        <span class="wax-seal">{{ sigil }}</span>
+        <span class="sign-rule"></span>
+      </footer>
+    </article>
 
     <div class="scroll-actions no-print">
-      <button onclick="window.print()" class="btn btn-ghost" style="font-size:13px;padding:10px 22px">🖨 Save as PDF</button>
-      <a href="/letter/" class="btn btn-ghost" style="font-size:13px;padding:10px 22px">✦ Write another letter</a>
+      <button onclick="window.print()" class="btn btn-ghost" style="font-size:13px;padding:11px 24px">Save as PDF</button>
+      <a href="/letter/" class="btn btn-ghost" style="font-size:13px;padding:11px 24px">Write another letter</a>
     </div>
   </div>
 </div>
@@ -28,18 +96,29 @@
 
 {% block scripts %}
 <script>
-// Gentle scroll-reveal — each paragraph eases in as you reach it, so the
-// letter unrolls like a scroll instead of dumping all at once.
 (function () {
+  // Paragraph scroll-reveal — the letter unrolls as you read.
   const paras = document.querySelectorAll('.letter-body p');
-  if (!('IntersectionObserver' in window)) {
+  if ('IntersectionObserver' in window) {
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('seen'); io.unobserve(e.target); } });
+    }, { threshold: 0.12, rootMargin: '0px 0px -8% 0px' });
+    paras.forEach(p => io.observe(p));
+  } else {
     paras.forEach(p => p.classList.add('seen'));
-    return;
   }
-  const io = new IntersectionObserver((entries) => {
-    entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('seen'); io.unobserve(e.target); } });
-  }, { threshold: 0.15, rootMargin: '0px 0px -8% 0px' });
-  paras.forEach(p => io.observe(p));
+
+  // Cursor light — a soft warm glow follows the pointer across the paper.
+  const paper = document.getElementById('paper');
+  if (paper && window.matchMedia('(pointer:fine)').matches) {
+    paper.addEventListener('pointermove', (e) => {
+      const r = paper.getBoundingClientRect();
+      paper.style.setProperty('--mx', ((e.clientX - r.left) / r.width * 100) + '%');
+      paper.style.setProperty('--my', ((e.clientY - r.top) / r.height * 100) + '%');
+      paper.classList.add('lit');
+    });
+    paper.addEventListener('pointerleave', () => paper.classList.remove('lit'));
+  }
 })();
 </script>
 {% endblock %}
