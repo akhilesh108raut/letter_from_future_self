@@ -112,6 +112,19 @@
 @keyframes lx-pulse { 0%,100% { opacity: .7; } 50% { opacity: 1; } }
 @media (prefers-reduced-motion: reduce) { .quote-sigil .qs-glyph { animation: none; } }
 
+/* Section break between the quote hero and the letter itself — reads as
+   two distinct sections instead of the paper crowding straight in under
+   the sigil. */
+.section-break {
+  display: flex; align-items: center; justify-content: center; gap: 22px;
+  max-width: 420px; margin: 70px auto 56px; color: rgba(207,168,74,.5);
+}
+.section-break .sb-line { flex: 1; height: 1px; background:
+  linear-gradient(90deg, transparent, rgba(207,168,74,.45), transparent); }
+.section-break .sb-dot { width: 5px; height: 5px; border-radius: 50%;
+  background: var(--lx-gold); box-shadow: 0 0 8px rgba(207,168,74,.6); }
+@media (max-width: 680px) { .section-break { margin: 52px auto 40px; } }
+
 /* ── THE HEIRLOOM DOCUMENT — black obsidian tablet, gold ink & frame ────── */
 .letter-paper {
   position: relative; max-width: 720px; margin: 0 auto;
@@ -244,9 +257,24 @@
 
 /* ── RESPONSIVE ────────────────────────────────────────────────────────── */
 @media (max-width: 680px) {
-  .letter-paper { padding: 54px 26px; }
+  .letter-luxe { padding: 56px 14px 90px; }
+  .letter-paper {
+    /* More generous side padding than the border/corners sit at, so the
+       frame reads as a proper margin around the text instead of crowding
+       it — the earlier 26px/26px collision made everything feel cramped. */
+    padding: 60px 30px;
+    border-radius: 16px;
+  }
+  .letter-paper::after { inset: 12px; border-radius: 11px; }
+  .corner { width: 20px; height: 20px; }
+  .corner.tl { top: 14px; left: 14px; }
+  .corner.tr { top: 14px; right: 14px; }
+  .corner.bl { bottom: 14px; left: 14px; }
+  .corner.br { bottom: 14px; right: 14px; }
   .manuscript-rail { display: none; }
-  .letter-body p:first-of-type::first-letter { font-size: 2.8em; }
+  .letter-body p:first-of-type::first-letter { font-size: 2.6em; padding: 6px 8px 0 0; }
+  .lh-name { font-size: clamp(34px, 11vw, 48px); }
+  .quote-mark { max-width: 13ch; }
 }
 
 /* ── PRINT ─────────────────────────────────────────────────────────────── */
