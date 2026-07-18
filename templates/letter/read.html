@@ -2,22 +2,44 @@
 {% block title %}Your Letter From Your Future Self{% endblock %}
 
 {% block content %}
-<div class="wrap" style="max-width:820px;padding-top:60px;padding-bottom:80px">
+<div class="scroll-stage">
+  <div class="wrap" style="max-width:820px">
 
-  <div style="text-align:center;margin-bottom:34px" class="fade-up">
-    <div class="letter-chapter">{{ ai.life_chapter or "A Letter From Your Future Self" }}</div>
-    {% if ai.core_truth %}
-    <p class="letter-pullquote">“{{ ai.core_truth }}”</p>
-    {% endif %}
-  </div>
+    <div style="text-align:center" class="fade-up">
+      <div class="letter-chapter">{{ ai.life_chapter or "A Letter From Your Future Self" }}</div>
+      {% if ai.core_truth %}
+      <p class="letter-pullquote">“{{ ai.core_truth }}”</p>
+      {% endif %}
+    </div>
 
-  <div class="letter-paper fade-up d1">
-    <div class="letter-body">{% for para in (ai.letter or "").split('\n\n') %}{% if para.strip() %}<p>{{ para.strip() }}</p>{% endif %}{% endfor %}</div>
-  </div>
+    <div class="scroll-ornament">✦ ❦ ✦</div>
 
-  <div class="no-print" style="text-align:center;margin-top:34px;display:flex;gap:14px;justify-content:center;flex-wrap:wrap">
-    <button onclick="window.print()" class="btn btn-ghost" style="font-size:13px;padding:10px 22px">🖨 Save as PDF</button>
-    <a href="/letter/" class="btn btn-ghost" style="font-size:13px;padding:10px 22px">✦ Write another letter</a>
+    <div class="letter-paper fade-up d1">
+      <div class="letter-body">{% for para in (ai.letter or "").split('\n\n') %}{% if para.strip() %}<p>{{ para.strip() }}</p>{% endif %}{% endfor %}</div>
+    </div>
+
+    <div class="scroll-actions no-print">
+      <button onclick="window.print()" class="btn btn-ghost" style="font-size:13px;padding:10px 22px">🖨 Save as PDF</button>
+      <a href="/letter/" class="btn btn-ghost" style="font-size:13px;padding:10px 22px">✦ Write another letter</a>
+    </div>
   </div>
 </div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+// Gentle scroll-reveal — each paragraph eases in as you reach it, so the
+// letter unrolls like a scroll instead of dumping all at once.
+(function () {
+  const paras = document.querySelectorAll('.letter-body p');
+  if (!('IntersectionObserver' in window)) {
+    paras.forEach(p => p.classList.add('seen'));
+    return;
+  }
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('seen'); io.unobserve(e.target); } });
+  }, { threshold: 0.15, rootMargin: '0px 0px -8% 0px' });
+  paras.forEach(p => io.observe(p));
+})();
+</script>
 {% endblock %}

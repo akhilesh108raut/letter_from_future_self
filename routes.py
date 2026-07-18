@@ -84,6 +84,14 @@ def _ensure_ai(letter: Letter) -> dict:
         letter.ai_json = json.dumps(ai, separators=(",", ":"), default=str)
         letter.generated_at = datetime.utcnow()
         db.session.commit()
+        # Email the reader their letter — once, right after it's cached.
+        # Best-effort: never let an email failure affect generation.
+        try:
+            from services.email_send import send_letter_email
+            send_letter_email(letter.order.email, letter.order.name or "",
+                              letter.uuid, ai)
+        except Exception:
+            log.exception("Letter email dispatch failed for %s", letter.uuid)
     return ai
 
 

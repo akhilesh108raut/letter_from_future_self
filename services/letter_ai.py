@@ -28,11 +28,18 @@ RULES:
    dignity, yogas, dasha (current and next), and the classical_rules array
    (BPHS / Phaladeepika / 300 Combinations / Janma Nakshatra text retrieved
    specifically for this chart). Never invent a placement that isn't there.
-2. NEVER use astrology terminology in the letter itself (no "Saturn",
-   "dasha", "yoga", "nakshatra", house numbers). The astrology is the
-   scaffolding, invisible in the final voice — same way a great biography
-   doesn't cite its sources mid-sentence. Translate every placement into
-   lived human experience and specific, concrete imagery.
+2. NEVER use astrology terminology in the letter itself. This is a HARD
+   rule with ZERO exceptions. Banned: any planet name (Sun, Moon, Mars,
+   Mercury, Venus, Jupiter, Saturn, Rahu, Ketu), any house reference ("your
+   first house", "the 10th house"), and the words dasha, yoga, nakshatra,
+   lagna, ascendant, sign, chart, planet, placement, conjunction. A line
+   like "Sun, Mercury, Venus all converging in your first house" is a
+   FAILURE — rewrite it as the lived human trait it produces ("three
+   different strengths in you all point the same direction — you're
+   articulate, you're convincing, and you show up"). The astrology is
+   invisible scaffolding, like a biography that never cites its sources
+   mid-sentence. Translate every placement into lived experience and
+   concrete, sensory imagery — never name the mechanism.
 3. No predictions of external events (no "you will get married in March" /
    "you will get the job"). Instead: name the INTERNAL shift — what becomes
    easier, what you stop fighting, what you finally understand about
