@@ -125,25 +125,23 @@
   background: var(--lx-gold); box-shadow: 0 0 8px rgba(207,168,74,.6); }
 @media (max-width: 680px) { .section-break { margin: 52px auto 40px; } }
 
-/* ── THE HEIRLOOM DOCUMENT — black obsidian tablet, gold ink & frame ────── */
+/* ── THE HEIRLOOM DOCUMENT — black obsidian tablet, thin gold hairline ──── */
 .letter-paper {
   position: relative; max-width: 720px; margin: 0 auto;
   padding: 80px 72px;
   color: var(--lx-ink);
-  border-radius: 20px;
+  border-radius: 14px;
   background:
     radial-gradient(120% 100% at 50% 0%, #171226 0%, var(--lx-paper) 55%, #050308 100%);
   box-shadow:
     0 40px 100px rgba(0,0,0,.7),
     0 8px 28px rgba(0,0,0,.5),
-    0 0 0 1px rgba(207,168,74,.55),
-    0 0 60px rgba(207,168,74,.10),
-    inset 0 0 0 1px rgba(207,168,74,.22),
-    inset 0 40px 80px rgba(207,168,74,.05);
+    0 0 0 1px rgba(207,168,74,.4),
+    0 0 34px rgba(207,168,74,.06);
 }
 /* faint starlit texture instead of paper fibre, to match the obsidian surface */
 .letter-paper::before {
-  content: ""; position: absolute; inset: 0; border-radius: 20px; pointer-events: none;
+  content: ""; position: absolute; inset: 0; border-radius: 14px; pointer-events: none;
   opacity: .6;
   background-image:
     radial-gradient(1px 1px at 20% 30%, rgba(207,168,74,.16), transparent),
@@ -151,11 +149,10 @@
     radial-gradient(1px 1px at 45% 85%, rgba(207,168,74,.12), transparent),
     radial-gradient(1px 1px at 88% 22%, rgba(207,168,74,.14), transparent);
 }
-/* double gold inner border */
+/* single thin inner hairline — one clean line, not a heavy double frame */
 .letter-paper::after {
-  content: ""; position: absolute; inset: 16px; border-radius: 14px;
-  border: 1px solid rgba(207,168,74,.55);
-  box-shadow: inset 0 0 0 3px rgba(207,168,74,.08), inset 0 0 0 4px rgba(207,168,74,.28);
+  content: ""; position: absolute; inset: 10px; border-radius: 9px;
+  border: 1px solid rgba(207,168,74,.28);
   pointer-events: none;
 }
 /* cursor light — soft golden glow tracking the pointer */
@@ -165,14 +162,17 @@
     radial-gradient(120% 100% at 50% 0%, #171226 0%, var(--lx-paper) 55%, #050308 100%);
 }
 
-/* gold corner ornaments */
-.corner { position: absolute; width: 26px; height: 26px; z-index: 3;
-  border: 0 solid var(--lx-gold); opacity: .85;
-  filter: drop-shadow(0 0 4px rgba(207,168,74,.5)); }
-.corner.tl { top: 26px; left: 26px; border-top-width: 2px; border-left-width: 2px; border-top-left-radius: 6px; }
-.corner.tr { top: 26px; right: 26px; border-top-width: 2px; border-right-width: 2px; border-top-right-radius: 6px; }
-.corner.bl { bottom: 26px; left: 26px; border-bottom-width: 2px; border-left-width: 2px; border-bottom-left-radius: 6px; }
-.corner.br { bottom: 26px; right: 26px; border-bottom-width: 2px; border-right-width: 2px; border-bottom-right-radius: 6px; }
+/* hand-drawn floral corner ornaments (original artwork, not a stock asset) */
+.corner {
+  position: absolute; width: 56px; height: 56px; z-index: 3;
+  color: var(--lx-gold); opacity: .8;
+  filter: drop-shadow(0 0 3px rgba(207,168,74,.35));
+}
+.corner-svg { width: 100%; height: 100%; display: block; }
+.corner.tl { top: 6px; left: 6px; }
+.corner.tr { top: 6px; right: 6px; transform: scaleX(-1); }
+.corner.bl { bottom: 6px; left: 6px; transform: scaleY(-1); }
+.corner.br { bottom: 6px; right: 6px; transform: scale(-1,-1); }
 
 /* illuminated-manuscript rail down the left margin */
 .manuscript-rail {
@@ -257,24 +257,26 @@
 
 /* ── RESPONSIVE ────────────────────────────────────────────────────────── */
 @media (max-width: 680px) {
-  .letter-luxe { padding: 56px 14px 90px; }
+  .letter-luxe { padding: 44px 0 70px; }
+  /* Almost full-bleed: the shared .wrap padding (24px, from store.css) is
+     overridden here so the card nearly touches the screen edges instead of
+     floating with wide dead margins on either side. */
+  .letter-luxe .wrap { padding: 0 8px; }
   .letter-paper {
-    /* More generous side padding than the border/corners sit at, so the
-       frame reads as a proper margin around the text instead of crowding
-       it — the earlier 26px/26px collision made everything feel cramped. */
-    padding: 60px 30px;
-    border-radius: 16px;
+    padding: 46px 20px;
+    border-radius: 10px;
   }
-  .letter-paper::after { inset: 12px; border-radius: 11px; }
-  .corner { width: 20px; height: 20px; }
-  .corner.tl { top: 14px; left: 14px; }
-  .corner.tr { top: 14px; right: 14px; }
-  .corner.bl { bottom: 14px; left: 14px; }
-  .corner.br { bottom: 14px; right: 14px; }
+  .letter-paper::after { inset: 7px; border-radius: 7px; }
+  .corner { width: 34px; height: 34px; }
+  .corner.tl { top: 3px; left: 3px; }
+  .corner.tr { top: 3px; right: 3px; }
+  .corner.bl { bottom: 3px; left: 3px; }
+  .corner.br { bottom: 3px; right: 3px; }
   .manuscript-rail { display: none; }
   .letter-body p:first-of-type::first-letter { font-size: 2.6em; padding: 6px 8px 0 0; }
   .lh-name { font-size: clamp(34px, 11vw, 48px); }
   .quote-mark { max-width: 13ch; }
+  .quote-hero, .section-break { margin-left: 8px; margin-right: 8px; }
 }
 
 /* ── PRINT ─────────────────────────────────────────────────────────────── */
