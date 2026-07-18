@@ -7,7 +7,7 @@ free instead of paying. See routes.py's /api/order/<uuid>/share.
 """
 import os
 
-PRICE_INR = int(os.getenv("LETTER_PRICE_INR", "11"))
+PRICE_INR = int(os.getenv("LETTER_PRICE_INR", "1"))
 CURRENCY = "INR"
 SHARE_TARGET = int(os.getenv("LETTER_SHARE_TARGET", "3"))
 
