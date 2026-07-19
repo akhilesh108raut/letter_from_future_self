@@ -131,16 +131,30 @@
     paras.forEach(p => p.classList.add('seen'));
   }
 
-  // Cursor light — a soft warm glow follows the pointer across the paper.
+  // Warm glow follows the finger/cursor across the paper — works for both
+  // mouse (pointermove) and touch (touchmove), so mobile gets the light too.
   const paper = document.getElementById('paper');
-  if (paper && window.matchMedia('(pointer:fine)').matches) {
-    paper.addEventListener('pointermove', (e) => {
+  if (paper) {
+    const moveGlow = (clientX, clientY) => {
       const r = paper.getBoundingClientRect();
-      paper.style.setProperty('--mx', ((e.clientX - r.left) / r.width * 100) + '%');
-      paper.style.setProperty('--my', ((e.clientY - r.top) / r.height * 100) + '%');
+      paper.style.setProperty('--mx', ((clientX - r.left) / r.width * 100) + '%');
+      paper.style.setProperty('--my', ((clientY - r.top) / r.height * 100) + '%');
       paper.classList.add('lit');
-    });
+    };
+    paper.addEventListener('pointermove', (e) => moveGlow(e.clientX, e.clientY));
     paper.addEventListener('pointerleave', () => paper.classList.remove('lit'));
+    // Touch: light up where the finger touches/drags, fade shortly after lift.
+    let fade;
+    const onTouch = (e) => {
+      const t = e.touches[0]; if (!t) return;
+      clearTimeout(fade);
+      moveGlow(t.clientX, t.clientY);
+    };
+    paper.addEventListener('touchstart', onTouch, { passive: true });
+    paper.addEventListener('touchmove', onTouch, { passive: true });
+    paper.addEventListener('touchend', () => {
+      fade = setTimeout(() => paper.classList.remove('lit'), 900);
+    }, { passive: true });
   }
 })();
 </script>
